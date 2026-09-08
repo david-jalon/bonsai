@@ -6,13 +6,13 @@ export type Link = {
 
 export const links: Link[] = [
     {
-        label: 'LinkedIn',
-        url: 'https://www.linkedin.com/in/davidjalon',
+        label: 'Github',
+        url: 'https://github.com/david-jalon',
         category: 'redes'
     },
     {
-        label: 'Github',
-        url: 'https://github.com/david-jalon',
+        label: 'LinkedIn',
+        url: 'https://www.linkedin.com/in/davidjalon',
         category: 'redes'
     },
     {

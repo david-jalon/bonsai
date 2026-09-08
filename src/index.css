@@ -9,3 +9,33 @@
 
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
+
+.link-card {
+  position: relative;
+  background: rgba(22, 27, 34, 0.6);      /* surface semi-transparente */
+  backdrop-filter: blur(8px);              /* efecto "glass" */
+  transition: all 0.3s ease;
+}
+
+.link-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgba(255,176,0,0) 0%, rgba(255,176,0,0) 100%);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask-composite: xor;
+  transition: background 0.3s ease;
+}
+
+.link-card:hover::before {
+  background: linear-gradient(135deg, rgba(255,176,0,0.55) 0%, rgba(255,176,0,0.25) 100%);
+}
+
+.link-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(255,176,0,0.15);
+  background: rgba(22, 27, 34, 0.8);
+}
