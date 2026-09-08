@@ -21,6 +21,7 @@ export const dropdowns: Dropdown[] = [
     label: 'Proyectos destacados',
     links: [
       { label: 'Helpfinder', url: 'https://helpfinder-theta.vercel.app/', icon: 'helpfinder' },
+      { label: 'Zaiko', url: 'https://github.com/david-jalon/zaiko', icon: 'zaiko' },
     ],
   },
   {
