@@ -5,13 +5,14 @@ import LinkCard from './components/LinkCard'
 import { dropdowns } from './data/links'
 import DropdownCard from './components/DropdownCard'
 import CVButton from './components/CVButton'
+import Footer from './components/Footer'
 
 
 function App() {
 
   return (
     <>
-      <div className="min-h-screen bg-terminal text-text flex flex-col items-center px-4 justify-center py-16">
+      <div className="min-h-dvh bg-terminal text-text flex flex-col items-center px-4 justify-center py-16">
         <div className="flex flex-col items-center gap-8 max-w-md w-full">
           <Avatar />
           <Bio />
@@ -24,6 +25,7 @@ function App() {
             ))}
             <CVButton />
           </div>
+          <Footer />
         </div>
       </div>
 

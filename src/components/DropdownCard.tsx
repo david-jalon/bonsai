@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { Dropdown } from '../data/links'
+import CardIcon from './CardIcon'
 
 type DropdownCardProps = { dropdown: Dropdown }
 
@@ -33,6 +34,9 @@ export default function DropdownCard({ dropdown }: DropdownCardProps) {
                 rel={link.url.startsWith('http') ? 'noopener noreferrer' : undefined}
                 className="link-card font-mono mx-auto w-full max-w-xs flex items-center justify-center gap-3 px-4 py-3 rounded-xl text-sm text-text hover:text-amber"
               >
+                <span className="text-amber">
+                  <CardIcon name={link.icon} />
+                </span>
                 {link.label}
               </a>
             ))}
