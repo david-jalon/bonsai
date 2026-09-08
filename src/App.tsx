@@ -2,6 +2,9 @@ import Avatar from './components/Avatar'
 import Bio from './components/Bio'
 import { links } from './data/links'
 import LinkCard from './components/LinkCard'
+import { dropdowns } from './data/links'
+import DropdownCard from './components/DropdownCard'
+import CVButton from './components/CVButton'
 
 
 function App() {
@@ -16,6 +19,10 @@ function App() {
             {links.map((link) => (
               <LinkCard key={link.label} link={link} />
             ))}
+            {dropdowns.map(dropdown => (
+              <DropdownCard key={dropdown.label} dropdown={dropdown} />
+            ))}
+            <CVButton />
           </div>
         </div>
       </div>

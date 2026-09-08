@@ -1,38 +1,32 @@
 export type Link = {
-    label: string;
-    url: string;
-    category: 'redes' | 'trabajos' | 'contacto';
+  label: string
+  url: string
+}
+
+export type Dropdown = {
+  label: string
+  links: Link[]
 }
 
 export const links: Link[] = [
-    {
-        label: 'Github',
-        url: 'https://github.com/david-jalon',
-        category: 'redes'
-    },
-    {
-        label: 'LinkedIn',
-        url: 'https://www.linkedin.com/in/davidjalon',
-        category: 'redes'
-    },
-    {
-        label: 'Website',
-        url: 'https://pordeterminar.com',
-        category: 'redes'
-    },
-    {
-        label: 'Helpfinder',
-        url: 'https://helpfinder-theta.vercel.app/',
-        category: 'trabajos'
-    },
-    {
-        label: 'Email',
-        url: 'mailto:davidjalon@protonmail.com',
-        category: 'contacto'
-    },
-    {
-        label: 'CV',
-        url: '/CV_David_Jalon.pdf',
-        category: 'contacto'
-    }
-];
+  { label: 'LinkedIn', url: 'https://www.linkedin.com/in/davidjalon' },
+  { label: 'GitHub', url: 'https://github.com/david-jalon' },
+  { label: 'Portfolio', url: '/portfolio.html' },
+  { label: 'Email', url: 'mailto:davidjalon@protonmail.com' },
+]
+
+export const dropdowns: Dropdown[] = [
+  {
+    label: 'Proyectos destacados',
+    links: [
+      { label: 'Helpfinder', url: 'https://helpfinder-theta.vercel.app/' },
+    ],
+  },
+  {
+    label: 'Antiguos proyectos FX',
+    links: [
+      { label: 'Vimeo', url: 'https://vimeo.com/878328452' },
+      { label: 'IMDb', url: 'https://www.imdb.com/es-es/name/nm11576765/' },
+    ],
+  },
+]
