@@ -12,7 +12,7 @@ export type Dropdown = {
 export const links: Link[] = [
   { label: 'LinkedIn', url: 'https://www.linkedin.com/in/davidjalon', icon: 'linkedin' },
   { label: 'GitHub', url: 'https://github.com/david-jalon', icon: 'github' },
-  { label: 'Portfolio', url: '/portfolio.html', icon: 'portfolio' },
+  { label: 'Portfolio', url: 'https://website-davidjalon.vercel.app/', icon: 'portfolio' },
   { label: 'Email', url: 'mailto:davidjalon@protonmail.com', icon: 'email' },
 ]
 
