@@ -18,6 +18,10 @@ interface ShapeGridBackgroundProps {
   className?: string
 }
 
+// Tope de densidad: en pantallas 3x (iPhone) dibujar a 2x ya se ve nítido y
+// evita triplicar el coste de pintado por frame.
+const MAX_DPR = 2
+
 export default function ShapeGridBackground({
   direction = 'right',
   speed = 1,
@@ -36,12 +40,17 @@ export default function ShapeGridBackground({
   const hoveredSquareRef = useRef<GridOffset | null>(null)
   const trailCells = useRef<GridOffset[]>([])
   const cellOpacities = useRef<Map<string, number>>(new Map())
+  // Tamaño en píxeles CSS. El bitmap puede ser mayor (dpr), pero todo el
+  // dibujo se hace en px CSS gracias a ctx.setTransform().
+  const viewSize = useRef<GridOffset>({ x: 0, y: 0 })
 
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
+    if (!ctx) return
 
+    const debug = new URLSearchParams(window.location.search).has('debug')
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
     const isHex = shape === 'hexagon'
@@ -49,18 +58,9 @@ export default function ShapeGridBackground({
     const hexHoriz = squareSize * 1.5
     const hexVert = squareSize * Math.sqrt(3)
 
-    const resizeCanvas = () => {
-      canvas.width = canvas.offsetWidth
-      canvas.height = canvas.offsetHeight
-      numSquaresX.current = Math.ceil(canvas.width / squareSize) + 1
-      numSquaresY.current = Math.ceil(canvas.height / squareSize) + 1
-    }
-
-    window.addEventListener('resize', resizeCanvas)
-    resizeCanvas()
+    const getDpr = () => Math.min(window.devicePixelRatio || 1, MAX_DPR)
 
     const drawHex = (cx: number, cy: number, size: number) => {
-      if (!ctx) return
       ctx.beginPath()
       for (let i = 0; i < 6; i++) {
         const angle = (Math.PI / 3) * i
@@ -73,14 +73,12 @@ export default function ShapeGridBackground({
     }
 
     const drawCircle = (cx: number, cy: number, size: number) => {
-      if (!ctx) return
       ctx.beginPath()
       ctx.arc(cx, cy, size / 2, 0, Math.PI * 2)
       ctx.closePath()
     }
 
     const drawTriangle = (cx: number, cy: number, size: number, flip: boolean) => {
-      if (!ctx) return
       ctx.beginPath()
       if (flip) {
         ctx.moveTo(cx, cy + size / 2)
@@ -94,17 +92,41 @@ export default function ShapeGridBackground({
       ctx.closePath()
     }
 
+    const drawDebug = () => {
+      const dprReal = window.devicePixelRatio || 1
+      const dprUsed = getDpr()
+      const w = viewSize.current.x
+      const h = viewSize.current.y
+      const ratio = canvas.width / (w * dprUsed)
+
+      ctx.fillStyle = 'rgba(13, 17, 23, 0.78)'
+      ctx.fillRect(12, 12, 272, 84)
+      ctx.strokeStyle = 'rgba(255, 176, 0, 0.55)'
+      ctx.lineWidth = 1
+      ctx.strokeRect(12.5, 12.5, 271, 83)
+
+      ctx.fillStyle = '#FFB000'
+      ctx.font = '12px ui-monospace, SFMono-Regular, Menlo, monospace'
+      ctx.textBaseline = 'top'
+      ctx.fillText(`dpr ${dprReal.toFixed(2)} → ${dprUsed.toFixed(2)}`, 22, 22)
+      ctx.fillText(`css ${w}×${h} · bitmap ${canvas.width}×${canvas.height}`, 22, 40)
+      ctx.fillText(`ratio ${ratio.toFixed(2)} · celda ${squareSize}px`, 22, 58)
+    }
+
     const drawGrid = () => {
-      if (!ctx) return
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      const w = viewSize.current.x
+      const h = viewSize.current.y
+      if (w === 0 || h === 0) return
+
+      ctx.clearRect(0, 0, w, h)
 
       if (isHex) {
         const colShift = Math.floor(gridOffset.current.x / hexHoriz)
         const offsetX = ((gridOffset.current.x % hexHoriz) + hexHoriz) % hexHoriz
         const offsetY = ((gridOffset.current.y % hexVert) + hexVert) % hexVert
 
-        const cols = Math.ceil(canvas.width / hexHoriz) + 3
-        const rows = Math.ceil(canvas.height / hexVert) + 3
+        const cols = Math.ceil(w / hexHoriz) + 3
+        const rows = Math.ceil(h / hexVert) + 3
 
         for (let col = -2; col < cols; col++) {
           for (let row = -2; row < rows; row++) {
@@ -133,8 +155,8 @@ export default function ShapeGridBackground({
         const offsetX = ((gridOffset.current.x % halfW) + halfW) % halfW
         const offsetY = ((gridOffset.current.y % squareSize) + squareSize) % squareSize
 
-        const cols = Math.ceil(canvas.width / halfW) + 4
-        const rows = Math.ceil(canvas.height / squareSize) + 4
+        const cols = Math.ceil(w / halfW) + 4
+        const rows = Math.ceil(h / squareSize) + 4
 
         for (let col = -2; col < cols; col++) {
           for (let row = -2; row < rows; row++) {
@@ -161,8 +183,8 @@ export default function ShapeGridBackground({
         const offsetX = ((gridOffset.current.x % squareSize) + squareSize) % squareSize
         const offsetY = ((gridOffset.current.y % squareSize) + squareSize) % squareSize
 
-        const cols = Math.ceil(canvas.width / squareSize) + 3
-        const rows = Math.ceil(canvas.height / squareSize) + 3
+        const cols = Math.ceil(w / squareSize) + 3
+        const rows = Math.ceil(h / squareSize) + 3
 
         for (let col = -2; col < cols; col++) {
           for (let row = -2; row < rows; row++) {
@@ -188,8 +210,8 @@ export default function ShapeGridBackground({
         const offsetX = ((gridOffset.current.x % squareSize) + squareSize) % squareSize
         const offsetY = ((gridOffset.current.y % squareSize) + squareSize) % squareSize
 
-        const cols = Math.ceil(canvas.width / squareSize) + 3
-        const rows = Math.ceil(canvas.height / squareSize) + 3
+        const cols = Math.ceil(w / squareSize) + 3
+        const rows = Math.ceil(h / squareSize) + 3
 
         for (let col = -2; col < cols; col++) {
           for (let row = -2; row < rows; row++) {
@@ -211,19 +233,49 @@ export default function ShapeGridBackground({
         }
       }
 
-      const gradient = ctx.createRadialGradient(
-        canvas.width / 2,
-        canvas.height / 2,
-        0,
-        canvas.width / 2,
-        canvas.height / 2,
-        Math.sqrt(canvas.width ** 2 + canvas.height ** 2) / 2
-      )
+      const gradient = ctx.createRadialGradient(w / 2, h / 2, 0, w / 2, h / 2, Math.sqrt(w ** 2 + h ** 2) / 2)
       gradient.addColorStop(0, 'rgba(0, 0, 0, 0)')
       gradient.addColorStop(1, '#0D1117')
 
       ctx.fillStyle = gradient
-      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      ctx.fillRect(0, 0, w, h)
+
+      if (debug) drawDebug()
+    }
+
+    const resizeCanvas = () => {
+      const dpr = getDpr()
+      const rect = canvas.getBoundingClientRect()
+      const w = Math.max(1, Math.round(rect.width))
+      const h = Math.max(1, Math.round(rect.height))
+      const bitmapW = Math.round(w * dpr)
+      const bitmapH = Math.round(h * dpr)
+
+      // Evita borrar/redibujar si el tamaño no ha cambiado (ResizeObserver
+      // puede dispararse varias veces con los mismos valores).
+      if (w === viewSize.current.x && h === viewSize.current.y && canvas.width === bitmapW) {
+        return
+      }
+
+      viewSize.current = { x: w, y: h }
+      canvas.width = bitmapW
+      canvas.height = bitmapH
+      // A partir de aquí se dibuja en px CSS; el navegador escala al bitmap.
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+      numSquaresX.current = Math.ceil(w / squareSize) + 1
+      numSquaresY.current = Math.ceil(h / squareSize) + 1
+
+      if (debug) {
+        console.info('[ShapeGridBackground]', {
+          dprReal: window.devicePixelRatio,
+          dprUsed: dpr,
+          css: { w, h },
+          bitmap: { w: bitmapW, h: bitmapH },
+          bitmapRatio: bitmapW / (w * dpr),
+        })
+      }
+
+      drawGrid()
     }
 
     const updateAnimation = () => {
@@ -395,6 +447,27 @@ export default function ShapeGridBackground({
 
     canvas.addEventListener('mousemove', handleMouseMove)
     canvas.addEventListener('mouseleave', handleMouseLeave)
+
+    // --- Resincronización del tamaño (antes solo window.resize) ---
+    const ro = new ResizeObserver(() => resizeCanvas())
+    ro.observe(canvas)
+    window.addEventListener('resize', resizeCanvas)
+    window.visualViewport?.addEventListener('resize', resizeCanvas)
+
+    // Safari no cambia devicePixelRatio al hacer zoom de página, pero el resto
+    // de navegadores sí: reaccionamos a cambios de densidad.
+    let dprQuery: MediaQueryList | null = null
+    const onDprChange = () => {
+      resizeCanvas()
+      watchDpr()
+    }
+    const watchDpr = () => {
+      dprQuery?.removeEventListener('change', onDprChange)
+      dprQuery = window.matchMedia(`(resolution: ${window.devicePixelRatio || 1}dppx)`)
+      dprQuery.addEventListener('change', onDprChange)
+    }
+    watchDpr()
+
     let isVisible = false
     let isPageVisible = !document.hidden
 
@@ -432,10 +505,15 @@ export default function ShapeGridBackground({
     }
     document.addEventListener('visibilitychange', onVisibility)
 
+    // Primera medición: ya con drawGrid definido, así no hay frame en blanco.
+    resizeCanvas()
     tryStart()
 
     return () => {
+      ro.disconnect()
       window.removeEventListener('resize', resizeCanvas)
+      window.visualViewport?.removeEventListener('resize', resizeCanvas)
+      dprQuery?.removeEventListener('change', onDprChange)
       tryStop()
       io.disconnect()
       document.removeEventListener('visibilitychange', onVisibility)

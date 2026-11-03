@@ -16,8 +16,10 @@ body {
 
 .link-card {
   position: relative;
-  background: rgba(22, 27, 34, 0.6);      /* surface semi-transparente */
-  backdrop-filter: blur(8px);              /* efecto "glass" */
+  /* Fondo casi opaco en vez de "glass": en WebKit (Safari iPhone/macOS) el
+     backdrop-filter sobre una capa position: fixed hace que el fondo se
+     rasterice a escala incorrecta y el grid se vea ampliado. */
+  background: rgba(22, 27, 34, 0.92);
   transition: all 0.3s ease;
 }
 
@@ -41,7 +43,12 @@ body {
 .link-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 32px rgba(255,176,0,0.15);
-  background: rgba(22, 27, 34, 0.8);
+  background: rgba(22, 27, 34, 0.98);
+}
+
+/* Capa propia para el canvas: evita que WebKit reescale el fondo fijo. */
+.grid-canvas {
+  transform: translateZ(0);
 }
 
 @keyframes glow-pulse {

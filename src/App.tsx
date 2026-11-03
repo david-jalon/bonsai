@@ -15,7 +15,7 @@ function App() {
     <>
       <div className="min-h-dvh bg-terminal text-text flex flex-col items-center px-4 justify-center py-16 relative">
         <ShapeGridBackground
-          className="fixed inset-0 z-0 w-full h-full block opacity-70"
+          className="fixed inset-0 z-0 block w-full h-full opacity-70 grid-canvas"
           direction="diagonal"
           speed={0.4}
           squareSize={40}
